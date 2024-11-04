@@ -1,4 +1,3 @@
-# app/main.py
 import base64
 from fastapi import FastAPI, HTTPException, Request
 import requests
@@ -9,9 +8,6 @@ import io
 
 app = FastAPI()
 load_dotenv(f"{os.getcwd()}/.env", override=True)
-# curl -s -X POST -H "Content-Type: application/json" -d $'{"prompt": "self-portrait of a woman, lightning in the background", "no_of_images": 1}' http://127.0.0.1:8888/generate-image
-
-print(os.getenv("IMAGES"))
 
 # Function to call the Replicate API
 def generate_image(prompt: str, count: int):
@@ -67,6 +63,12 @@ def generate_image(prompt: str, count: int):
 # API endpoint to generate images
 @app.post("/generate-image")
 async def generate_image_endpoint(request: Request):
+    """
+    Generates an image from a prompt using the Replicate API.
+    Request Body:
+        - **prompt**: Text prompt to generate the image
+        - **no_of_images**: Number of image to create
+    """
     try:
         request_json = await request.json()
         no_of_images = request_json["no_of_images"]
@@ -74,6 +76,6 @@ async def generate_image_endpoint(request: Request):
         for index, _ in enumerate(range(no_of_images)):
             output = generate_image(request_json["prompt"], count=index+1)
             result.append(output)
-        return {"status": "success", "result": result}
+        return {"status": "success", "mesage": "Images Generated Successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
